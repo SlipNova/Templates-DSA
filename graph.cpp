@@ -108,26 +108,30 @@ vector<int> topSort(graph<int> &g) {
     reverse(order.begin(), order.end());
     return order;
 }
-// recursive
-void dfsRS(graph<int> &g, int s, vector<bool> &visited, vector<int> &order) {
-    visited[s] = true;
-    for (auto it: g.al[s]) {
-        if (!visited[it]) {
-            dfsRS(g, it, visited, order);
+
+// dfs with cycle
+bool dfsC(graph<int> &g, int node, vector<int> &state, vector<int> &order) {
+    state[node] = 1; 
+    for (auto it : g.al[node]) {
+        if (state[it] == 0) {
+            if (dfsC(g, it, state, order)) return true; 
+        } else if (state[it] == 1) {
+            return true; 
         }
     }
-    order.push_back(s);
+    state[node] = 2;
+    order.push_back(node);
+    return false;
 }
-vector<int> RtopSort(graph<int> &g) {
-    int n = g.n;
+
+vector<int> topSortCycle(graph<int> &g) {
     vector<int> order;
-    vector<bool> visited(n, false);
-    for (int i = 0; i < n; i++) {
-        if (!visited[i]) {
-            dfsRS(g, i, visited, order);
+    vector<int> state(g.n, 0);
+    for (int i = 0; i < g.n; i++) {
+        if (state[i] == 0) {
+            if (dfsC(g, i, state, order)) return {}; 
         }
     }
     reverse(order.begin(), order.end());
     return order;
 }
-

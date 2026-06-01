@@ -5,7 +5,10 @@ using namespace std;
 using ll = long long;
 using ld = long double;
 using unit = unsigned int;
+<<<<<<< HEAD
 using ull = unsigned long long;
+=======
+>>>>>>> b6caff5 (update)
 
 #define all(x) (x).begin(), (x).end()
 #define rall(x) (x).rbegin(), (x).rend()

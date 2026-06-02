@@ -105,7 +105,7 @@ struct Mint {
     }
 
     bool sqrt(Mint& a) const {
-        
+        return false;
     }
 };
 

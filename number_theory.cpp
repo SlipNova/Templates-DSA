@@ -184,14 +184,3 @@ bool MRprime(u64 n, int rounds = 20) {
     }
     return true; // prime i guess P(error) <= 1/2^(rounds)
 }// atleast 3/4 of bases fail better than 50%
-
-int main() {
-    vector<bool> primes = sieve(100);
-    vector<int> spf = SPF(100);
-    vector<int> factors = factorize(100, spf);
-    vector<int> uf = uniqueFactors(100, spf);
-    for (auto it : uf) {
-        cout << it << ' ';
-    }
-    
-}

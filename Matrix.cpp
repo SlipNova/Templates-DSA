@@ -117,6 +117,74 @@ public:
         return res;
     }
 
+    pair<int, vector<T>> gauss(const Matrix<T>& A, const Matrix<T>& b) {
+        assert(b.cols() == 1); 
+        assert(A.rows() == b.rows()); 
+        Matrix<T> Aug(A.rows(), A.cols() + 1); 
+        int m = A.rows(); 
+        int n = A.cols(); 
+        for (int i = 0; i < A.rows(); i++) { 
+            for (int j = 0; j < A.cols() + 1; j++) { 
+                if (j < A.cols()) { 
+                    Aug(i, j) = A(i, j); 
+                } 
+                else { 
+                    Aug(i, j) = b(i, 0); 
+                } 
+            } 
+        }
+        vector<int> where(n, -1);
+        vector<T> ans(n, T());
+        int rank = 0; // essentially represents the number of pivots found so far, used this to keep track or row exchanges
+        for (int col = 0; col < n && rank < m; col++) {
+            int pivot = -1;
+            for (int row = rank; row < m; row++) {
+                if (Aug(row, col) != T()) {
+                    pivot = row;
+                    break;
+                }
+            }
+            if (pivot == -1) continue;
+            for (int j = 0; j <= n; j++) {
+                swap(Aug(pivot, j), Aug(rank, j));
+            }
+            T div = Aug(rank, col);
+            for (int j = col; j <= n; j++) {
+                Aug(rank, j) /= div;
+            }
+            for (int row = 0; row < m; row++) {
+                if (row == rank) continue;
+                T factor = Aug(row, col);
+                for (int j = col; j <= n; j++) {
+                    Aug(row, j) -= factor * Aug(rank, j);
+                }
+            }
+            where[col] = rank;
+            rank++;
+        }
+        for (int row = 0; row < m; row++) {
+            bool allZero = true;
+            for (int col = 0; col < n; col++) {
+                if (Aug(row, col) != T()) {
+                    allZero = false;
+                    break;
+                }
+            }
+            if (allZero && Aug(row, n) != T()) {
+                return {0, {}}; // no solution
+            }
+        }
+        for (int col = 0; col < n; col++) {
+            if (where[col] != -1) {
+                ans[col] = Aug(where[col], n);
+            }
+        }
+        if (rank < n) {
+            return {2, ans}; // infinite solutions
+        }
+        return {1, ans}; // unique solution
+    }
+
     struct LUResult {
         Matrix L;
         Matrix U;
@@ -210,6 +278,14 @@ public:
         return inv;
     }
 
+    bool operator==(const Matrix& B) const {
+        if (R != B.R || C != B.C) return false;
+        for (int i = 0; i < R * C; i++) {
+            if (a[i] != B.a[i]) return false;
+        }
+        return true;
+    }
+
     friend ostream& operator<<(ostream& os, const Matrix& M) {
         for (int i = 0; i < M.R; i++) {
             for (int j = 0; j < M.C; j++) {
@@ -220,7 +296,6 @@ public:
         return os;
     }
 };
-
 
 int main() {
     Matrix<double> A(2, 2);

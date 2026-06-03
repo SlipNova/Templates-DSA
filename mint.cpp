@@ -109,6 +109,45 @@ struct Mint {
     }
 };
 
+template<uint mod = MOD>
+struct Factorials {
+    using M = Mint<mod>;
+    vector<M> fact, ifact;
+    Factorials () {};
+    Factorials (int n) {
+        init(n);
+    }
+    void init(int n) {
+        fact.assign(n + 1, 1);
+        ifact.assign(n + 1, 1);
+        for (int i = 1; i <= n; i++) {
+            fact[i] = fact[i - 1] * i;
+        }
+        ifact[n] = fact[n].inv();
+        for (int i = n - 1; i > 1; i--) {
+            ifact[i] = ifact[i + 1] * (i + 1);
+        }
+    }
+
+    M factorial(int n) {
+        return fact[n];
+    }
+
+    M invFactorial(int n) {
+        return ifact[n];
+    }
+
+    M C(int n, int r) {
+        if (r < 0 || r > n) return 0;
+        return fact[n] * ifact[r] * ifact[n - r];
+    }
+
+    M P(int n, int r) {
+        if (r < 0 || r > n) return 0;
+        return fact[n] * ifact[n - r];
+    }
+};
+
 
 int main() {
     ios_base::sync_with_stdio(false);

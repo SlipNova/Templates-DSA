@@ -2,6 +2,18 @@
 
 using namespace std;
 using ll = long long;
+using u64 = unsigned long long;
+using u128 = __uint128_t;
+
+u64 mod_pow(u64 a, u64 e, u64 mod) {
+    u64 res = 1;
+    while (e) {
+        if (e & 1) res = (u128)res * a % mod;
+        a = (u128)a * a % mod;
+        e >>= 1;
+    }
+    return res;
+}
 
 bool isPrime(int n) {
     if (n < 2) return false;
@@ -130,6 +142,48 @@ pair<ll, ll> crtSystem(const vector<ll>& b, const vector<ll>& m) {
     }
     return {ans, lcm};
 }
+
+bool witness(u64 a, u64 n) {
+    u64 d = n - 1;
+    int u = 0;
+    while ((d & 1) == 0) { // breaking n - 1 = 2^s * d
+        d >>= 1;
+        u++;
+    }
+    u64 x = mod_pow(a, d, n);
+    if (x == 1 || x == n - 1) return false; // if we start at 1, -1 then a cannot be witness
+    for (int i = 1; i < u; i++) {
+        x = (u128)x * x % n;
+        if (x == n - 1) return false; // x0 != 1 or -1, now if we hit -1 then next must be 1 so a cannot be a witness cause rest of the sequence is juts 1
+        if (x == 1) return true; // if we hit 1 means we didn't hit -1 before so n is composite, there are non trivial solutions to x^2 = 1, as we hit 1 before hitting -1 previously, so a is a witness
+    }
+    return true;
+}
+
+bool isPrimeMR(u64 n) {
+    if (n < 2) return false;
+    for (u64 p : {2ULL, 3ULL, 5ULL, 7ULL, 11ULL, 13ULL, 17ULL, 19ULL, 23ULL, 29ULL, 31ULL, 37ULL}) {
+        if (n == p) return true;
+        if (n % p == 0) return false;
+    }
+    for (u64 a : {2ULL, 3ULL, 5ULL, 7ULL, 11ULL, 13ULL, 17ULL, 19ULL, 23ULL, 29ULL, 31ULL, 37ULL}) {
+        if (witness(a, n)) return false;
+    }
+    return true;
+}
+
+bool MRprime(u64 n, int rounds = 20) {
+    if (n < 2) return false;
+    if (n == 2 || n == 3) return true;
+    if ((n & 1) == 0) return false;
+    static std::mt19937_64 rng(std::chrono::steady_clock::now().time_since_epoch().count());
+    std::uniform_int_distribution<u64> dist(2, n - 2);
+    for (int i = 0; i < rounds; i++) {
+        u64 a = dist(rng);
+        if (witness(a, n)) return false;
+    }
+    return true; // prime i guess P(error) <= 1/2^(rounds)
+}// atleast 3/4 of bases fail better than 50%
 
 int main() {
     vector<bool> primes = sieve(100);

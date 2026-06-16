@@ -1,3 +1,7 @@
+#include <bits/stdc++.h>
+
+using namespace std;
+
 struct ListNode {
     int val;
     ListNode* next;
@@ -15,6 +19,26 @@ struct ListNode {
     }
 };
 
+ListNode* reverseList(ListNode* head) {
+    ListNode* prev = nullptr;
+    ListNode* curr = head;
+    while (curr) {
+        ListNode* nxt = curr->next;
+        curr->next = prev;
+        prev = curr;
+        curr = nxt;
+    }
+    return prev;
+}
+
+void print(ListNode* head) {
+    ListNode* curr = head;
+    while (curr != nullptr) {
+        cout << curr -> val << (curr -> next != nullptr ? ' ' : '\n');
+        curr = curr -> next;
+    }
+}
+
 ListNode* create(vector <int>& a) {
     if (a.size() == 0) {
         return NULL;
@@ -28,15 +52,6 @@ ListNode* create(vector <int>& a) {
     }
     return head;
  }
-
-void print(ListNode* head) {
-    ListNode* curr = head;
-    while (curr != nullptr) {
-        cout << curr -> val << ' ';
-        curr = curr -> next;
-    }
-    cout << '\n';
-}
 
 int length(ListNode* head) {
     ListNode* curr = head;
@@ -70,3 +85,23 @@ ListNode* removeNthFromEnd(ListNode* head, int n) {
     return head;
 }
 
+int pairSum(ListNode* head) { // sum with twin 2330leet
+    int len = length(head);
+    int half = len / 2;
+    ListNode* h = head;
+    ListNode* temp = head;
+    for (int i = 0; i < half; i++) {
+        temp = temp->next;
+    }
+    if (len % 2 == 1) {
+        temp = temp->next;
+    }
+    temp = reverseList(temp);
+    int ans = INT_MIN;
+    while (temp != nullptr) {
+        ans = max(ans, temp->val + h->val);
+        temp = temp->next;
+        h = h->next;
+    }
+    return ans;
+}
